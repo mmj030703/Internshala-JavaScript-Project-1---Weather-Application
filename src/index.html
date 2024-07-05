@@ -5,10 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
     <!-- External CSS Link -->
-    <link href="/dist/output.css" rel="stylesheet">
+    <!-- <link href="/dist/output.css" rel="stylesheet"> -->
+    <!-- Font Awesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Font - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CDN Link -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        clifford: '#da373d',
+                    },
+                    fontFamily: {
+                        poppins: ['"Poppins"', 'sans-serif'], // Google Font
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body>
-    
+    <!-- Main Section -->
+    <main class="flex font-poppins">
+        <!-- Main Weather Section -->
+        <section class="min-w-fit p-4 shadow-lg h-screen">
+            <!-- Search Section -->
+            <article>
+                <input type="text" placeholder="Enter City Name" autocomplete="false" class="border border-slate-700 rounded-full py-2 ps-3 pe-5">
+                <i class="fa-solid fa-magnifying-glass text-lg ms-2 bg-slate-800 text-white py-[10px] px-[15px] rounded-full"></i>
+                <i class="fa-solid fa-location-crosshairs text-lg ms-2 bg-slate-800 text-white py-[10px] px-[15px] rounded-full"></i>
+            </article>
+
+            <!-- Main Weather Data Section -->
+            <article class="mt-5">
+                <img src="../resources/sunny.png" alt="Weather Icon" class="w-64 my-10 mx-auto">
+                <article class="mt-5">
+                    <p class="text-2xl font-semibold">Mumbai, Maharashtra, India</p>
+                    <article class="flex justify-between items-center mt-2 text-xl pe-4">
+                        <p>12°C</p>
+                        <p>Monday, 16:00</p>
+                    </article>
+                </article>
+            </article>
+        </section>
+        <!-- Main Weather Section -->
+
+        <section class="bg-slate-100 flex-grow py-4 ps-8 pe-4">
+            <!-- Other Weather Details Section -->
+            <section>
+                <section class="flex gap-x-3">
+                    <!-- Extended Weather forecast Button -->
+                    <p class="w-full flex justify-between items-center pe-4 bg-slate-800 text-white rounded-md p-2">View Weather for next 5 days</p>
+                    <!-- Recent Search Dropdown Menu -->
+                    <select class="border-2  border-slate-800 rounded-md">
+                        <option>Mumbai</option>
+                        <option>Delhi</option>
+                        <option>Kolkata</option>
+                        <option>Chennai</option>
+                        <option>Vishakapatnam</option>
+                    </select>
+                </section>
+                <!-- Extented Weather for 5 days -->
+                <section class="mt-3 flex flex-wrap gap-y-4 gap-x-4">
+                    <!-- Day Weather -->
+                    <article class="bg-white text-center w-fit p-3 rounded-xl shadow-lg">
+                        <p>Sun</p>
+                        <img src="../resources/cloudy.png" alt="Weather" class="w-36">
+                        <p>30°C</p>
+                    </article>
+                    <!-- Day Weather -->
+                    <article class="bg-white text-center w-fit p-3 rounded-xl shadow-lg">
+                        <p>Sun</p>
+                        <img src="../resources/cloudy.png" alt="Weather" class="w-36">
+                        <p>30°C</p>
+                    </article>
+                    <!-- Day Weather -->
+                    <article class="bg-white text-center w-fit p-3 rounded-xl shadow-lg">
+                        <p>Sun</p>
+                        <img src="../resources/cloudy.png" alt="Weather" class="w-36">
+                        <p>30°C</p>
+                    </article>
+                    <!-- Day Weather -->
+                    <article class="bg-white text-center w-fit p-3 rounded-xl shadow-lg">
+                        <p>Sun</p>
+                        <img src="../resources/cloudy.png" alt="Weather" class="w-36">
+                        <p>30°C</p>
+                    </article>
+                    <!-- Day Weather -->
+                    <article class="bg-white text-center w-fit p-3 rounded-xl shadow-lg">
+                        <p>Sun</p>
+                        <img src="../resources/cloudy.png" alt="Weather" class="w-36">
+                        <p>30°C</p>
+                    </article>
+                </section>
+            </section>
+            <!-- Today's Highlight -->
+            <section class="mt-10">
+                <h2 class="text-3xl font-semibold">Today's Highlight</h2>
+                <section class="mt-3 flex gap-x-5 gap-y-5 flex-wrap">
+                    <!-- Weather Data -->
+                    <article class="bg-white min-w-[200px] text-center w-fit p-3 rounded-xl shadow-lg">
+                        <h3 class="font-semibold text-lg">UV Index</h3>
+                        <p class="mt-3 text-lg">7</p>
+                    </article>
+                    <!-- Weather Data -->
+                    <article class="bg-white min-w-[200px] text-center w-fit p-3 rounded-xl shadow-lg">
+                        <h3 class="font-semibold text-lg">Wind Speed</h3>
+                        <p class="mt-3 text-lg">34.2 km/hr</p>
+                    </article>
+                    <!-- Weather Data -->
+                    <article class="bg-white min-w-[200px] text-center w-fit p-3 rounded-xl shadow-lg">
+                        <h3 class="font-semibold text-lg">Humidity</h3>
+                        <p class="mt-3 text-lg">87.2%</p>
+                    </article>
+                    <!-- Weather Data -->
+                    <article class="bg-white min-w-[200px] text-center w-fit p-3 rounded-xl shadow-lg">
+                        <h3 class="font-semibold text-lg">Precipitation</h3>
+                        <p class="mt-3 text-lg">95.83</p>
+                    </article>
+                    <!-- Weather Data -->
+                    <article class="bg-white min-w-[200px] text-center w-fit p-3 rounded-xl shadow-lg">
+                        <h3 class="font-semibold text-lg">Visibility</h3>
+                        <p class="mt-3 text-lg">9.8 km</p>
+                    </article>
+                    <!-- Weather Data -->
+                    <article class="bg-white min-w-[200px] text-center w-fit p-3 rounded-xl shadow-lg">
+                        <h3 class="font-semibold text-lg">Dew</h3>
+                        <p class="mt-3 text-lg">26.4</p>
+                    </article>
+                </section>
+            </section>
+            <!-- Other Weather Details Section -->
+        </section>
+    </main>
+    <!-- Main Section -->
 
     <!-- External Script File -->
     <script src="./src/app.js"></script>
