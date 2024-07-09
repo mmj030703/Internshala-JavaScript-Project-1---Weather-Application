@@ -53,17 +53,21 @@
             </article>
             <!-- Other Weather Details Section -->
             <section>
-                <section class="flex gap-x-3">
+                <section class="flex gap-x-3 items-center">
                     <!-- Extended Weather forecast Button -->
-                    <p class="hidden extended-forecast-heading w-full justify-between items-center pe-4 bg-slate-800 text-white rounded-md p-2">View Weather for next 5 days</p>
+                    <p class="hidden extended-forecast-heading w-full bg-slate-800 text-white rounded-md p-2">View Weather for next 5 days</p>
                     <!-- Recent Search Dropdown Menu -->
-                    <select class="border-2  border-slate-800 rounded-md hidden">
-                        <option>Mumbai</option>
+                    <section class="recent-search-dropdown-container group relative rounded-md hidden">
+                        <p class="recent-search-heading cursor-pointer w-max bg-slate-800 text-white rounded-md p-2">Recent Searches</p>
+                        <!-- <option>Mumbai</option>
                         <option>Delhi</option>
                         <option>Kolkata</option>
                         <option>Chennai</option>
-                        <option>Vishakapatnam</option>
-                    </select>
+                        <option>Vishakapatnam</option> -->
+                        <section class="recent-search-dropdown hidden group-hover:block w-full absolute top-[41px] bg-slate-300 shadow-lg rounded-lg z-10">
+
+                        </section>
+                    </section>
                 </section>
                 <!-- Extented Weather for 5 days -->
                 <section class="extended-forecast-container mt-3 flex flex-wrap gap-y-4 gap-x-4">

@@ -1,11 +1,11 @@
 // Features to be added
-// - search by city name - display weather | == user can do anyone among them
+// - search by location name - display weather | == user can do anyone among them - done
 // - current location - display weather    |
-// - dropdown menu for recently search cities - use localstorage - initially no dropdown
-// - clicking on any city in dropdown should update the weather
-// - Valid user inputs
-// - Functionality to implement extended weather for multiple days - 5 days
-// - Handle API errors gracefully
+// - dropdown menu for recently search cities - use localstorage - initially no dropdown - done
+// - clicking on any city in dropdown should update the weather - done
+// - Valid user inputs - done
+// - Functionality to implement extended weather for multiple days - 5 days - done
+// - Handle API errors gracefully - done
 
 // Global Variables
 const locationInput = document.querySelector('main .location-input');
@@ -22,6 +22,10 @@ const weatherOtherDetailsContainer = document.querySelector('.other-weather-sect
 const weatherOtherDetailsContainerHeading = document.querySelector('.other-weather-details-section-heading');
 const extendedForecastHeading = document.querySelector('.extended-forecast-heading');
 const extendedForecastContainer = document.querySelector('.extended-forecast-container');
+const recentSearchDropdownContainer = document.querySelector('.recent-search-dropdown-container');
+const recentSearchDropdown = document.querySelector('.recent-search-dropdown');
+
+const recentSearchDropdownHeading = document.querySelector('.recent-search-heading');
 
 
 const VISUAL_CROSSING_API_KEY = "8ZLS6YDNME24NJG9R37MG7RU2";
@@ -31,6 +35,8 @@ const apiUrls = {
     byLocationName: (locationName) => `${VISUAL_CROSSING_BASE_URL}${locationName}/?unitGroup=metric&include=days&key=${VISUAL_CROSSING_API_KEY}&contentType=json`,
     byPositionalValues: (latitude, longitude) => `${VISUAL_CROSSING_BASE_URL}${latitude}%2${longitude}?unitGroup=metric&include=days&key=${VISUAL_CROSSING_API_KEY}&contentType=json`
 }
+
+const recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
 
 const weatherTypesImages = {
     sunny: "../resources/sunny.png",
@@ -185,26 +191,103 @@ function updatedExtendedWeatherDetails(weatherData) {
     });
 }
 
+
+// Function to add option element in recent search dropdown
+function addLocationToRecentSearch(locationName, toAddForcefully) {
+    if (!toAddForcefully && (recentSearches.length && recentSearches.includes(locationName.toLowerCase()))) return;
+
+    // Option to remove if the children length goes 11 -> One default with 10 location names
+    if (recentSearchDropdown.children.length === 10) {
+        recentSearchDropdown.children[recentSearchDropdown.children.length - 1].remove();
+    }
+
+    // Adding location option to the recentSearchDropdown
+    const option = document.createElement("p");
+    option.className = "location-option cursor-pointer block py-2 px-2 hover:bg-slate-200";
+    option.textContent = locationName.slice(0, 1).toUpperCase() + locationName.slice(1);
+    if(!toAddForcefully) {
+        recentSearchDropdown.insertBefore(option, recentSearchDropdown.children[0]);
+        recentSearches.push(locationName.toLowerCase());
+        localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+    } else {
+        recentSearchDropdown.appendChild(option);
+    }
+}
+
+// Function to generate popup
+function popupMessage(message, color) {
+    const container = document.createElement('div');
+    const p = document.createElement('p');
+    
+    p.textContent = message;
+    container.className = `bg-white py-2 ps-2 pe-3 rounded-lg min-w-[200px] shadow-lg border-2 ${color === '#ff0000' ? 'border-red-600 text-red-600' : 'border-green-600 text-green-600'} absolute right-5 top-5`;
+    p.className = "w-full";
+
+    container.appendChild(p);
+    document.body.appendChild(container);
+
+    setTimeout(() => {
+        container.remove();
+    }, 3000);
+}
+
+
+// Function to validate the location name
+function validateLocationName(locationName) {
+    if (locationName === "") {
+        popupMessage("Enter Location!", "#ff0000");
+        return;
+    }
+
+    return true;
+}
+
+
 // Function to fetch weather data
-async function fetchWeatherData(e) {
-    const locationName = locationInput.value;
+async function fetchWeatherData(e, locationNamePassed) {
+    const locationName = locationNamePassed ? locationNamePassed : locationInput.value;
+
+    if (!validateLocationName(locationName.toLowerCase().trim())) return;
+
     try {
         const weatherResponse = await fetch(apiUrls.byLocationName(locationName));
         const weatherResponseJson = await weatherResponse.json();
-        console.log(weatherResponseJson);
 
         // Changing the styles of elements 
         noCityEnteredElement.style.display = "none";
         weatherOtherDetailsContainerHeading.style.display = "block";
         extendedForecastHeading.style.display = "block";
 
-
         updateMainWeatherDetails(weatherResponseJson);
         updateOtherWeatherDetails(weatherResponseJson);
         updatedExtendedWeatherDetails(weatherResponseJson);
+
+        recentSearchDropdownContainer.style.display = "block";
+        addLocationToRecentSearch(locationName, false);
     } catch (error) {
-        console.log("Error: ", error);
+        if (error.toString().includes("not valid JSON")) popupMessage("Location does not Name!", "#ff0000");
+        else popupMessage("Network Error", "#ff0000");
     }
 }
 
+// Function to fetch data based on location clicked in the dropdown
+function fetchWeatherDataOnLocationClickedInDropdown(e) {
+    const target = e.target;
+    let locationName = null;
+
+    if (target.classList.contains("location-option")) {
+        locationName = e.target.textContent;
+        fetchWeatherData(e, locationName);
+    }
+}
+
+// Checking if recentSearches already have places searched before that show the weather of the least recently seen location and also show recent searches dropdown 
+if (recentSearches.length) {
+    recentSearches.toReversed().forEach((searchName, index) => { 
+        if (index === 0) fetchWeatherData(null, searchName);
+        addLocationToRecentSearch(searchName, true);
+    });
+}                                                                                                                                                                                                                                                                
+
 locationSearchBtn.addEventListener('click', fetchWeatherData);
+recentSearchDropdown.addEventListener('click', fetchWeatherDataOnLocationClickedInDropdown);
