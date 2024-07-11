@@ -1,6 +1,6 @@
 // Features to be added
 // - search by location name - display weather | == user can do anyone among them - done
-// - current location - display weather    |
+// - current location - display weather    | - done
 // - dropdown menu for recently search cities - use localstorage - initially no dropdown - done
 // - clicking on any city in dropdown should update the weather - done
 // - Valid user inputs - done
@@ -30,10 +30,13 @@ const recentSearchDropdownHeading = document.querySelector('.recent-search-headi
 
 const VISUAL_CROSSING_API_KEY = "8ZLS6YDNME24NJG9R37MG7RU2";
 const VISUAL_CROSSING_BASE_URL = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/";
+const GEO_CODE_BASE_URL = "https://geocode.maps.co/reverse?";
+const GEO_CODE_API_KEY = "668cd66d4bc6b339749963owr35b6b3";
 
 const apiUrls = {
     byLocationName: (locationName) => `${VISUAL_CROSSING_BASE_URL}${locationName}/?unitGroup=metric&include=days&key=${VISUAL_CROSSING_API_KEY}&contentType=json`,
-    byPositionalValues: (latitude, longitude) => `${VISUAL_CROSSING_BASE_URL}${latitude}%2${longitude}?unitGroup=metric&include=days&key=${VISUAL_CROSSING_API_KEY}&contentType=json`
+    byPositionalValues: (latitude, longitude) => `${VISUAL_CROSSING_BASE_URL}${latitude},${longitude}?unitGroup=metric&include=days&key=${VISUAL_CROSSING_API_KEY}&contentType=json`,
+    findLocationByPositions: (latitude, longitude) => `${GEO_CODE_BASE_URL}lat=${latitude}&lon=${longitude}&api_key=${GEO_CODE_API_KEY}`
 }
 
 const recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
@@ -49,10 +52,11 @@ const weatherTypesImages = {
 };
 
 // Function to update main weather elements data
-function updateMainWeatherDetails(weatherData) {
-    const { address: name } = weatherData;
+function updateMainWeatherDetails(weatherData, locationName) {
+    let { address: name } = weatherData;
     const { icon, temp, datetime: date, datetimeEpoch: timeInMilliseconds, description } = weatherData?.days[0];
     let iconImageURL = null;
+    name = locationName ? locationName : name;
 
     // Show Weather Related Elements 
     mainWeatherSection.style.display = "block";
@@ -63,6 +67,7 @@ function updateMainWeatherDetails(weatherData) {
     });
     
     mainWeatherImage.src = iconImageURL;
+    mainWeatherImage.title = icon;
     mainWeatherLocationName.textContent = name.toUpperCase();
     mainWeatherLocationTemp.textContent = temp + " °C";
     mainWeatherLocationDateTime.textContent = date;
@@ -96,8 +101,8 @@ function updateOtherWeatherDetails(weatherData) {
         const weatherPropertyValue = document.createElement("p");
 
         // Adding Classes
-        weatherPropertyArticle.className = "bg-white min-w-[200px] text-center w-fit p-3 rounded-xl shadow-lg";
-        weatherPropertyHeading.className = "font-semibold text-lg";
+        weatherPropertyArticle.className = "bg-white flex-grow min-[360px]:flex-grow-0 w-[140px] h-[120px] text-center p-3 rounded-xl shadow-xl";
+        weatherPropertyHeading.className = "font-semibold text-xl";
         weatherPropertyValue.className = "mt-3 text-lg";
 
         // Adding the Values
@@ -162,21 +167,28 @@ function updatedExtendedWeatherDetails(weatherData) {
     removePreviousChildren(extendedForecastContainer);
 
     weatherData?.days?.slice(1, 6).forEach(day => { 
-        const { datetime: date, icon, temp } = day;
+        const { datetime: date, icon, temp, humidity, windspeed } = day;
 
         // Creating elements
         const extendedWeatherPropertyArticle = document.createElement('article');
         const extendedWeatherPropertyWeek = document.createElement('h3');
         const extendedWeatherPropertyImageURL = document.createElement('img');
-        const extendedWeatherPropertyValue = document.createElement("p");
+        const extendedWeatherTemperatureValue = document.createElement("p");
+        const extendedWeatherHumidityValue = document.createElement("p");
+        const extendedWeatherWindSpeedValue = document.createElement("p");
 
         // Adding Classes
-        extendedWeatherPropertyArticle.className = "bg-white text-center w-fit p-3 rounded-xl shadow-lg";
-        extendedWeatherPropertyImageURL.className = "w-36 my-5";
+        extendedWeatherPropertyArticle.className = "bg-white space-y-2 flex-grow min-[385px]:flex-grow-0 text-center w-fit p-3 rounded-xl shadow-lg";
+        extendedWeatherPropertyImageURL.className = "w-36 mx-auto min-[385px]:mx-0 my-5";
+        extendedWeatherPropertyWeek.className = "font-bold text-lg";
 
         // Adding the Values
-        extendedWeatherPropertyWeek.textContent = getDayInWords(new Date(date).getDay());
-        extendedWeatherPropertyValue.textContent = temp + " °C";
+        extendedWeatherPropertyWeek.textContent = date;
+        extendedWeatherTemperatureValue.textContent = "Temp: " + temp + " °C";
+        extendedWeatherHumidityValue.textContent = "Humidity: " + humidity + " %";
+        extendedWeatherWindSpeedValue.textContent = "Wind: " + windspeed + " mph";
+
+        extendedWeatherPropertyArticle.title = icon;
         Object.keys(weatherTypesImages).forEach(weatherType => {
             if (icon.includes(weatherType)) {
                 extendedWeatherPropertyImageURL.src = weatherTypesImages[weatherType];
@@ -184,7 +196,7 @@ function updatedExtendedWeatherDetails(weatherData) {
         });
 
         // Appending elements to extendedWeatherPropertyArticle
-        extendedWeatherPropertyArticle.append(extendedWeatherPropertyWeek, extendedWeatherPropertyImageURL, extendedWeatherPropertyValue);
+        extendedWeatherPropertyArticle.append(extendedWeatherPropertyWeek, extendedWeatherPropertyImageURL, extendedWeatherTemperatureValue, extendedWeatherHumidityValue, extendedWeatherWindSpeedValue);
 
         // Appending extendedWeatherPropertyArticle to the extendedForecastContainer
         extendedForecastContainer.appendChild(extendedWeatherPropertyArticle);
@@ -244,13 +256,20 @@ function validateLocationName(locationName) {
 
 
 // Function to fetch weather data
-async function fetchWeatherData(e, locationNamePassed) {
+async function fetchWeatherData(e, locationNamePassed, latitude, longitude, tracedLocationName, isTrackLocationOn) {
     const locationName = locationNamePassed ? locationNamePassed : locationInput.value;
 
-    if (!validateLocationName(locationName.toLowerCase().trim())) return;
+    if (!isTrackLocationOn && !validateLocationName(locationName.toLowerCase().trim())) return;
 
     try {
-        const weatherResponse = await fetch(apiUrls.byLocationName(locationName));
+        locationInput.value = "";
+
+        let weatherResponse = null;
+        if (!latitude) {
+            weatherResponse = await fetch(apiUrls.byLocationName(locationName));
+        } else {
+            weatherResponse = await fetch(apiUrls.byPositionalValues(latitude, longitude));
+        }
         const weatherResponseJson = await weatherResponse.json();
 
         // Changing the styles of elements 
@@ -258,12 +277,15 @@ async function fetchWeatherData(e, locationNamePassed) {
         weatherOtherDetailsContainerHeading.style.display = "block";
         extendedForecastHeading.style.display = "block";
 
-        updateMainWeatherDetails(weatherResponseJson);
+        if (tracedLocationName) updateMainWeatherDetails(weatherResponseJson, tracedLocationName);
+        else updateMainWeatherDetails(weatherResponseJson);
+
         updateOtherWeatherDetails(weatherResponseJson);
         updatedExtendedWeatherDetails(weatherResponseJson);
 
         recentSearchDropdownContainer.style.display = "block";
-        addLocationToRecentSearch(locationName, false);
+
+        if(!isTrackLocationOn) addLocationToRecentSearch(locationName, false);
     } catch (error) {
         if (error.toString().includes("not valid JSON")) popupMessage("Location does not Name!", "#ff0000");
         else popupMessage("Network Error", "#ff0000");
@@ -289,5 +311,35 @@ if (recentSearches.length) {
     });
 }                                                                                                                                                                                                                                                                
 
+// Function to track location of user
+function trackLocation(e) {
+    // To check if geolocation is supported by browser or not
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(findCoordinates, findCoordinatesError, {enableHighAccuracy: true});
+    }
+}
+
+
+async function findLocationByPositions(latitude, longitude) {
+    const res = await fetch(apiUrls.findLocationByPositions(latitude, longitude));
+    const resJSON = await res.json();
+    return `${resJSON?.address?.city}, ${resJSON?.address?.state}`; 
+}
+
+// Function to find coordinates of current location
+async function findCoordinates(positions) {
+    const latitude = positions.coords.latitude;
+    const longitude = positions.coords.longitude;
+    const locationName = await findLocationByPositions(latitude, longitude);
+    fetchWeatherData(null, locationName, latitude, longitude, locationName, true);
+}
+
+
+// Function to handle error if user disables geolocation or any network error occurs
+function findCoordinatesError(error) {
+    popupMessage("Please Enable Location in settings!", "#ff0000")
+}
+
 locationSearchBtn.addEventListener('click', fetchWeatherData);
 recentSearchDropdown.addEventListener('click', fetchWeatherDataOnLocationClickedInDropdown);
+trackLocationBtn.addEventListener('click', trackLocation);
