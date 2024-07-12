@@ -42,13 +42,13 @@ const apiUrls = {
 const recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
 
 const weatherTypesImages = {
-    sunny: "../resources/sunny.png",
-    cloud: "../resources/cloudy.png",
-    rain: "../resources/rainy.png",
-    snow: "../resources/snow.png",
-    clear: "../resources/clear.png",
-    wind: "../resources/wind.png",
-    fog: "../resources/fog.png"
+    sunny: "./resources/sunny.png",
+    cloud: "./resources/cloudy.png",
+    rain: "./resources/rainy.png",
+    snow: "./resources/snow.png",
+    clear: "./resources/clear.png",
+    wind: "./resources/wind.png",
+    fog: "./resources/fog.png"
 };
 
 // Function to update main weather elements data

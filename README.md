@@ -12,17 +12,17 @@ A Weather Forecast Application built using HTML, Tailwind CSS, and JavaScript. T
 
 ## Demo
 
-Check out the live demo [here]().
+Check out the live demo [here](https://mmj030703.github.io/Internshala-JavaScript-Project-1---Weather-Application/).
 
 ## Installation
 
 1. Clone the repository:
    ```sh
-   git clone repo-name
+   git clone https://github.com/mmj030703/Internshala-JavaScript-Project-1---Weather-Application.git
    ```
 2. Navigate to the project directory:
    ```sh
-   cd directory-name
+   cd Internshala-JavaScript-Project-1---Weather-Application
    ```
 3. Open `index.html` in your browser.
 
