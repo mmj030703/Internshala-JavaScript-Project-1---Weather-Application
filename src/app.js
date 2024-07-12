@@ -66,6 +66,7 @@ function updateMainWeatherDetails(weatherData, locationName) {
         if(icon.includes(key)) iconImageURL = weatherTypesImages[key];
     });
     
+    // Setting Properties
     mainWeatherImage.src = iconImageURL;
     mainWeatherImage.title = icon;
     mainWeatherLocationName.textContent = name.toUpperCase();
@@ -79,9 +80,9 @@ function removePreviousChildren(container) {
     Array.from(container.children).forEach(child => child.remove());
 } 
 
-
 // function to update other weather element details
 function updateOtherWeatherDetails(weatherData) {
+    // Removing Previous Elements that were added 
     removePreviousChildren(weatherOtherDetailsContainer);
 
     const { dew, humidity, precip, windspeed, uvindex, visibility } = weatherData?.days[0];
@@ -206,6 +207,7 @@ function updatedExtendedWeatherDetails(weatherData) {
 
 // Function to add option element in recent search dropdown
 function addLocationToRecentSearch(locationName, toAddForcefully) {
+    // To return if searched location already there in recentSearches array
     if (!toAddForcefully && (recentSearches.length && recentSearches.includes(locationName.toLowerCase()))) return;
 
     // Option to remove if the children length goes 11 -> One default with 10 location names
@@ -320,6 +322,7 @@ function trackLocation(e) {
 }
 
 
+// Function to fetch data for location based on latitude & longitude positions
 async function findLocationByPositions(latitude, longitude) {
     const res = await fetch(apiUrls.findLocationByPositions(latitude, longitude));
     const resJSON = await res.json();
@@ -340,6 +343,7 @@ function findCoordinatesError(error) {
     popupMessage("Please Enable Location in settings!", "#ff0000")
 }
 
+// Adding Event Listeners
 locationSearchBtn.addEventListener('click', fetchWeatherData);
 recentSearchDropdown.addEventListener('click', fetchWeatherDataOnLocationClickedInDropdown);
 trackLocationBtn.addEventListener('click', trackLocation);
